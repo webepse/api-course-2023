@@ -1,0 +1,14 @@
+# api/config/packages/api_platform.yaml
+api_platform:
+    defaults:
+        # To enable or disable pagination for all resource collections.
+        pagination_enabled: false
+
+        # To allow the client to enable or disable the pagination.
+        pagination_client_enabled: true
+
+        # To allow the client to set the number of items per page.
+        pagination_client_items_per_page: true
+
+        # The default number of items per page.
+        pagination_items_per_page: 30
