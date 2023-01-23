@@ -24,12 +24,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
         'groups' => ['customers_read']
     ],
     operations: [
-        new Get(
-            uriTemplate: '/client/{id}'
-        ), 
-        new GetCollection(
-            uriTemplate: '/client'
-        ),
+        new Get(), 
+        new GetCollection(),
         new Post(),
         new Put(),
         new Patch(),
