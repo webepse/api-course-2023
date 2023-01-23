@@ -14,6 +14,7 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\InvoiceRepository;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Metadata\Link;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: InvoiceRepository::class)]
@@ -33,25 +34,35 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new Patch()
     ]
 )]
+#[ApiResource(
+    uriTemplate: '/customers/{id}/invoices',
+    uriVariables: [
+        'id' => new Link(fromClass: Customer::class, fromProperty: 'invoices')
+    ],
+    operations: [new GetCollection()],
+    normalizationContext: [
+        'groups' => ['invoices_subresource']
+    ]
+)]
 #[ApiFilter(OrderFilter::class, properties:['amount','sentAt'])]
 class Invoice
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['invoices_read','customers_read'])]
+    #[Groups(['invoices_read','customers_read','invoices_subresource'])]
     private ?int $id = null;
 
     #[ORM\Column]
-    #[Groups(['invoices_read','customers_read'])]
+    #[Groups(['invoices_read','customers_read','invoices_subresource'])]
     private ?float $amount = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(['invoices_read','customers_read'])]
+    #[Groups(['invoices_read','customers_read','invoices_subresource'])]
     private ?\DateTimeInterface $sentAt = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['invoices_read','customers_read'])]
+    #[Groups(['invoices_read','customers_read','invoices_subresource'])]
     private ?string $status = null;
 
     #[ORM\ManyToOne(inversedBy: 'invoices')]
@@ -60,7 +71,7 @@ class Invoice
     private ?Customer $customer = null;
 
     #[ORM\Column]
-    #[Groups(['invoices_read','customers_read'])]
+    #[Groups(['invoices_read','customers_read','invoices_subresource'])]
     private ?int $chrono = null;
 
     /**
