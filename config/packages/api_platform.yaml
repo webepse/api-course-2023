@@ -12,3 +12,6 @@ api_platform:
 
         # The default number of items per page.
         pagination_items_per_page: 30
+    collection:
+        pagination:
+            items_per_page_parameter_name: 'count'
