@@ -24,3 +24,6 @@ services:
     # please note that last definitions always *replace* previous ones
     App\Controller\InvoiceIncrementationController:
         public: true
+
+    App\Serializer\PatchedDateTimeNormalizer:
+        tags: [serializer.normalizer]

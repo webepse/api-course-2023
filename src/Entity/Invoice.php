@@ -18,6 +18,9 @@ use ApiPlatform\Metadata\Link;
 use App\Controller\InvoiceIncrementationController;
 use Symfony\Component\Serializer\Annotation\Groups;
 
+use Symfony\Component\Validator\Constraints as Assert;
+
+
 #[ORM\Entity(repositoryClass: InvoiceRepository::class)]
 #[ApiResource(
     paginationEnabled: true,
@@ -41,6 +44,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new Put(),
         new Delete(),
         new Patch()
+    ],
+    denormalizationContext:[
+        "disable_type_enforcement"=>true
     ]
 )]
 #[ApiResource(
@@ -64,24 +70,33 @@ class Invoice
 
     #[ORM\Column]
     #[Groups(['invoices_read','customers_read','invoices_subresource'])]
-    private ?float $amount = null;
+    #[Assert\NotBlank(message: "Le montant est obligatoire")]
+    #[Assert\Type(type:"numeric", message:"Le montat de la facture doit être au format numérique")]
+    private $amount = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Groups(['invoices_read','customers_read','invoices_subresource'])]
-    private ?\DateTimeInterface $sentAt = null;
+    #[Assert\NotBlank(message: "La date de la facture est obligatoire")]
+    #[Assert\Type(type:"datetime", message:"La date doit être au format YYYY-MM-DD")]
+    private $sentAt = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(['invoices_read','customers_read','invoices_subresource'])]
+    #[Assert\NotBlank(message: "Le statut de la facture est obligatoire")]
+    #[Assert\Choice(choices:["SENT","PAID","CANCELLED"], message: "Le statut doit être soit SENT, soit PAID ou soit CANCELLED")]
     private ?string $status = null;
 
     #[ORM\ManyToOne(inversedBy: 'invoices')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['invoices_read'])]
+    #[Assert\NotBlank(message: "Le client de la facture est obligatoire")]
     private ?Customer $customer = null;
 
     #[ORM\Column]
     #[Groups(['invoices_read','customers_read','invoices_subresource'])]
-    private ?int $chrono = null;
+    #[Assert\NotBlank(message: "Le chrono de la facture est obligatoire")]
+    #[Assert\Type(type:"integer",message:"Le chrono de la facture doit être au format numérique")]
+    private $chrono = null;
 
     /**
      * Permet de récup le user à qui appartient finalement la facture
@@ -104,7 +119,7 @@ class Invoice
         return $this->amount;
     }
 
-    public function setAmount(float $amount): self
+    public function setAmount($amount): self
     {
         $this->amount = $amount;
 
@@ -116,7 +131,7 @@ class Invoice
         return $this->sentAt;
     }
 
-    public function setSentAt(\DateTimeInterface $sentAt): self
+    public function setSentAt($sentAt): self
     {
         $this->sentAt = $sentAt;
 
@@ -152,7 +167,7 @@ class Invoice
         return $this->chrono;
     }
 
-    public function setChrono(int $chrono): self
+    public function setChrono($chrono): self
     {
         $this->chrono = $chrono;
 
