@@ -7,9 +7,12 @@ use App\Repository\UserRepository;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
+
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ApiResource(
@@ -17,6 +20,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         'groups' => ['users_read']
     ]
 )]
+#[UniqueEntity(fields:['email'],message:"Un utilisateur ayant cette adresse E-mail existe déjà")]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -27,6 +31,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 180, unique: true)]
     #[Groups(['users_read','customers_read','invoices_read'])]
+    #[Assert\NotBlank(message: "L'adresse E-mail ne peut pas être vide")]
+    #[Assert\Email(message:"Le format de l'adresse E-ail doit être valide")]
     private ?string $email = null;
 
     #[ORM\Column]
@@ -37,14 +43,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[Assert\NotBlank(message: "Le mot de passe est obligatoire")]
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(['users_read','customers_read','invoices_read'])]
+    #[Assert\NotBlank(message: "Le prénom ne peut pas être vide")]
+    #[Assert\Length(min:2, minMessage: "Le prénom doit faire entre 2 et 255 caractères", max: 255, maxMessage: "le prénom doit faire entre 2 et 255 caractères")]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(['users_read','customers_read','invoices_read'])]
+    #[Assert\NotBlank(message: "Le nom ne peut pas être vide")]
+    #[Assert\Length(min:2, minMessage: "Le nom doit faire entre 2 et 255 caractères", max: 255, maxMessage: "le nom doit faire entre 2 et 255 caractères")]
     private ?string $lastName = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Customer::class, orphanRemoval: true)]
