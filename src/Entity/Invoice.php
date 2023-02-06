@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: InvoiceRepository::class)]
 #[ApiResource(
-    paginationEnabled: true,
+    paginationEnabled: false,
     paginationItemsPerPage: 20,
     order: ['sentAt' => 'desc'],
     normalizationContext: [
